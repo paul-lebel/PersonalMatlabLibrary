@@ -1,0 +1,64 @@
+% Set up the Andor camera for highspeed data acquisition
+
+% Author: Paul Lebel
+% Date: April 2012
+
+addpath(fullfile(matlabroot,'toolbox','Andor'))
+bmpPath = fullfile(matlabroot,'toolbox','Andor','test','testBMP.bmp');
+spoolPath = fullfile(matlabroot,'toolbox','Andor','test','spool');
+installpath = fullfile(matlabroot,'toolbox','Andor','Camera Files');
+
+
+cd (installpath);
+
+returnCode=AndorInitialize(path);
+returnCode
+
+[ret]=SetShutter(0, 2, 50, 50);                 %   Close shutter
+[ret]=CoolerON;                                 %   Turn on temperature cooler
+[ret] = SetTemperature(0);                      %   Set temperature
+[ret]=SetTriggerMode(0);                        %   Set trigger mode; 0 for Internal, 6 external start, 10 software
+[ret]=SetReadMode(4);                           %   Set read mode; 4 for Image
+[ret]=SetAcquisitionMode(3);                    %   Set acquisition mode; 1 for Single Scan, 3 for kinetic
+[ret] = SetFrameTransferMode(1);                %   Use frame transfer mode
+[ret] = SetVSSpeed(1);                          %   Sets to 0.5us
+[ret] = SetVSAmplitude(1);                      %   Helps for fast shift speeds
+[ret] = SetIsolatedCropMode(1,10,10,1,1);       %   Isolated crop to go as fast as possible :)
+[ret]=SetExposureTime(0.000001);                %   Exposure will be determined by framerate
+[ret,XPixels, YPixels]=GetDetector;             %   Get the image size
+[ret] = SetFanMode(2)                           %   Turn fan off
+
+nFrames = 100000;
+[ret] = SetNumberKinetics(nFrames)
+
+data = zeros(YPixels, XPixels,nFrames);                 %   Allocate memory for images
+
+[ret,Exposure, Accumulate, Kinetic]=GetAcquisitionTimings;    %   Get acquisition setting
+
+[ret,gstatus]=AndorGetStatus;
+while(gstatus ~= 20073)%DRV_IDLE
+  pause(1.0);
+  disp('Not ready');
+  [ret,gstatus]=AndorGetStatus;
+end
+
+
+[ret]=SetShutter(0, 1, 50, 50);                 %   Open shutter and wait a bit
+pause(.1);
+
+[ret] = PrepareAcquisition();
+
+StartAcquisition;                               %   Start the acquisition
+
+[ret,gstatus]=AndorGetStatus;
+while(gstatus ~= 20073)%DRV_IDLE
+  pause(1.0);
+  disp('Acquiring');
+  [ret,gstatus]=AndorGetStatus;
+end
+
+[ret]=SetShutter(0, 1, 50, 50);                 %   Close the shutter
+
+             
+[ret,data]=GetAcquiredData( XPixels * YPixels*nFrames);  %   Get the data
+% [ret]=AndorShutDown;
