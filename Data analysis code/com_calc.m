@@ -1,6 +1,8 @@
-% awesome center of mass calculation
+% Center of mass calculation
+% Paul Lebel
+% czbiohub
 
-function [cx cy I ellip] = com_calc(vid)
+function [cx, cy, I, ellip] = com_calc(vid)
 
 % if size(size(vid)) ~= 3
 %     error('Incorrect dims')
