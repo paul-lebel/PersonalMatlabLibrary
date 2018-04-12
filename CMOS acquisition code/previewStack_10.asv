@@ -1,19 +1,18 @@
 % My preview
 
-function previewStack(vid,bgFlag, bigFsize)
+function previewStack_10(vid,bgFlag, bigFsize)
 % imaqmem(1500000000)
-dims = get(vid,'videoResolution');
+crop = get(vid,'ROIPosition');
+dims(1) = crop(3);
+dims(2) = crop(4);
 dims = circshift(dims,[0 1]);
 dims(1) = dims(1)/bigFsize;
 
 if bgFlag ==1
-    bg = takeBG(vid,100,pwd,bigFsize,1);
+    bg = int16(takeBG(vid,100,pwd,bigFsize,1));
 else
-    bg = zeros(dims);
+    bg = int16(zeros(dims));
 end
-
-bg = int16(bg);
-
 
 stop(vid)
 repeat = get(vid,'TriggerRepeat');
@@ -21,24 +20,26 @@ fPt = get(vid,'FramesPerTrigger');
 set(vid,'FramesPerTrigger',inf)
 
 fig = figure;
+im = imagesc(bg);
 
-stop(vid); start(vid); pause(0.02);
+start(vid);
 
-while(ishandle(fig))
+while ishandle(fig)
+    
     
     while(get(vid,'FramesAvailable') < 1)
         pause(0.001);
     end
     
-    data = peekdata(vid,1);
-    frame = int16(data(1:dims(1),:));
+    data = int16(peekdata(vid,1));
+    frame = data(1:dims(1),:);
     flushdata(vid);
-    
-    imagesc(frame-bg);
+    set(0,'CurrentFigure',fig);
+    imagesc(frame-bg) %,[0 1023]);
     colormap(jet); colorbar;
-    axis tight equal
+    axis equal;
+    drawnow;
     pause(.05);
-    
 end
 
 stop(vid)
