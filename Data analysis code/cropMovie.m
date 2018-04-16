@@ -1,4 +1,4 @@
-function crop = cropMovie(movie)
+function [crop cropcoords] = cropMovie(movie)
 
 dims = size(movie);
 waitfor(msgbox('Draw cropping box directly on image frame. Double-click when finished'));
@@ -26,10 +26,5 @@ y_end = y_start+y_width-1;
 
 
 crop = movie(y_start:y_end,x_start:x_end,:);
-
-% for i=round(linspace(1,dims(3)-1,100))
-%     imagesc(crop(:,:,i));
-%     pause(.03);
-% end
 
 delete(fig);
