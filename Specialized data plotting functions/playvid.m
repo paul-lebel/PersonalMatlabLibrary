@@ -31,9 +31,13 @@ colormap gray;
     
     h = imagesc(movie(:,:,framerange(1)),scale);
     i=0;
-    while (i < framerange(end)) && exist('fig','var')
+    while (i < framerange(end)) && h.isvalid
         i = i+1;
-        h.CData = movie(:,:,framerange(i)); 
+        if h.isvalid
+            h.CData = movie(:,:,framerange(i)); 
+        else
+            break;
+        end
         text(-3,-3,num2str(i));
         pause(1/fps);
     end
