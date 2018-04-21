@@ -1,8 +1,8 @@
 % Convert long image to stack of images
 function gstack = ReStackFrames(data,framedims,imgsPerFrame,numBigFrames)
 
-h = framedims(1);
-w = framedims(2);
+h = framedims(2);
+w = framedims(1);
 gstack = zeros(h,w,imgsPerFrame*numBigFrames,class(data));
 
 data = squeeze(data);

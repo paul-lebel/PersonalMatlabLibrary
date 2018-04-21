@@ -38,11 +38,11 @@ start(vid);
 while ishandle(fig)
     
     count = count + 1;
-    while(vid.FramesAcquired <= fa)
+    while(vid.FramesAvailable <= fa)
         pause(0.001);
     end
     
-    fa = vid.FramesAcquired;
+    fa = vid.FramesAvailable;
     
         data = int16(peekdata(vid,1));
         frame = data(1:dims(1),:);
@@ -50,6 +50,7 @@ while ishandle(fig)
     % Flush data once in a while to clear buffer
     if ~mod(count,flushFreq)
         flushdata(vid);
+        fa = 0;
     end
     
     if diffFlag

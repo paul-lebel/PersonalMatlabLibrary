@@ -15,9 +15,9 @@ function bg = takeBG(vidobj,numFrames,dirname,bigFrameSize,isStack)
 % afterwards
 fptOrig = get(vidobj,'FramesPerTrigger');
 trigRepOrig = get(vidobj,'TriggerRepeat');
-temp = get(vidobj,'VideoResolution');
-smallFdims(2) = temp(1);
-smallFdims(1) = temp(2); clear temp;
+crop = get(vidobj,'ROIPosition');
+smallFdims(1) = crop(3);
+smallFdims(2) = crop(4);
 
 % Accomodate for the possibility of stacked frames
 if isStack
